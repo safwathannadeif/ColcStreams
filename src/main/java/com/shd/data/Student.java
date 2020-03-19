@@ -42,13 +42,12 @@ public class Student {
     public int getRecordNu() {return recordNu++;}
     public void setRecordNu(int recordNu) {this.recordNu = recordNu;}
     public Optional<Integer> getLisId() { return lisId; }
-
+//
     public Student() {
 
     }
-
+//
     public Student(String namei,Gender genderi, int agei, GradeLevel gradeLeveli,int recordNui, String schoolNamei, int scorei, Integer lisIdi) {
-        //idnt = UUID.nameUUIDFromBytes((namei+"L" + String.valueOf(lisId)).getBytes()).toString().replaceAll("-","");
         idntStr = UUID.nameUUIDFromBytes(namei.getBytes()).toString().replaceAll("-", "");
         name = namei;
         gender=genderi ;
@@ -79,7 +78,7 @@ public class Student {
     public   List<Student>  makeList1() {
         //Optional<Integer> lisIdInp1 = Optional.of(1);
         int lisIdInp1 = 1;
-        List<Student>  studentLis1 = Arrays.asList(
+        return Arrays.asList(
                 new Student("GrandMary", Gender.Female, 6, GradeLevel.Six,1,"Erindale", 90, lisIdInp1),
                 new Student("Daniel", Gender.Male, 7, GradeLevel.Seven, 2,"Brookmede", 91, lisIdInp1),
                 new Student("David", Gender.Male, 8, GradeLevel.Eight,3, "Whitehead", 95, null),
@@ -93,10 +92,8 @@ public class Student {
                 new Student("Sophie", Gender.Female, 15, GradeLevel.One,11, "GreenGlad", 91, lisIdInp1),
                 new Student("George", Gender.Male, 14, GradeLevel.Four, 12,"LynnEagle", 98, lisIdInp1)
         );
-  return studentLis1 ;
     }
     public   List<Student>  makeList2() {
-        //Optional<Integer> lisIdInp2 = Optional.of(2);
         int lisIdInp2 =2 ;
         return Arrays.asList(
                 new Student("GrandMary", Gender.Female, 6, GradeLevel.Six,1,"Erindale", 92, lisIdInp2),
@@ -113,5 +110,4 @@ public class Student {
                 new Student("George", Gender.Male, 14, GradeLevel.Four, 12,"LynnEagle", 98, lisIdInp2)
         );
     }
-
 }

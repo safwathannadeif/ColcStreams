@@ -13,7 +13,7 @@ public class TestByCollectJDKIFBuiltIn {
  * * Function<A, R> finisher();
  * * Set<Characteristics> characteristics(); }
  * The interface Collector provides the static method Collector.of(...) to create a Collector in a more functional way.
- * helping us to reduce the need for an extra class. here is example for using this interfcae
+ * helping us to reduce the need for an extra class. here is example for using this interfcae.
  */
     public static void main(String[] args) {
 
@@ -29,7 +29,7 @@ public class TestByCollectJDKIFBuiltIn {
         System.out.println("result2:" + result2);
     }
 
-    public static <T> Collector<T, Set<T>, List<T>> uniqueCollector() { //This is a genric Distinct
+    public static <T> Collector<T, Set<T>, List<T>> uniqueCollector() { //This is a generic Distinct
         return Collector.of( () -> {
                    return  new HashSet<T>() ;        // supplier
                 }  ,

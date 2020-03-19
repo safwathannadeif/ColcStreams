@@ -27,12 +27,12 @@ public class NListsMatching<NXElm> {
         } ;
     public List<NXElm> matchNLsits(List<List<NXElm>> listOfLists) {
         sizeToComapre = listOfLists.size();
-        slectedFiteri=matchFilteri ;
+        selectedFiteri =matchFilteri ;
         return (matchOrDistinctNListsFunic2.matchNLsits(listOfLists));
     }
     public List<NXElm> distinctNLsits(List<List<NXElm>> listOfLists) {
         sizeToComapre = 1 ;
-        slectedFiteri=distinctFilteri ;
+        selectedFiteri =distinctFilteri ;
         return (matchOrDistinctNListsFunic2.matchNLsits(listOfLists));
     }
     // For Short list this simple match is Ok. For Long Lists with a million of records,
@@ -47,7 +47,7 @@ public class NListsMatching<NXElm> {
     private final Predicate<Integer>  distinctFilteri =iSize -> {
         return (iSize == sizeToComapre);
     };
-    private  Predicate<Integer>  slectedFiteri ;
+    private  Predicate<Integer> selectedFiteri;
     //Matching2ListsFunction is a Generic Function for simple Matching
     //Function implementations for any Type/XElm is implemented here and var parameter instance passed as implemented function (BiPredicate)
     // for Example Student Type call this function with List1<Student> , List2<Student> ,  and BiPredicate instance function
@@ -55,12 +55,12 @@ public class NListsMatching<NXElm> {
     private  MatchingNListsFunction <NXElm> matchOrDistinctNListsFunic2 = (listOfLists) ->
     {
         Map<String, List<NXElm>> map4StudLis = new HashMap();
-        listOfLists.stream().flatMap(xxx -> xxx.stream()).forEach(nxelm-> accumMatchi.accept(nxelm,map4StudLis));
+        listOfLists.stream().flatMap(xlis -> xlis.stream()).forEach(nxelm-> accumMatchi.accept(nxelm,map4StudLis));
 
         return (map4StudLis.entrySet().stream().map(inp -> inp.getValue())
                //  .peek(ll-> System.out.println(ll.size()))
                 //.filter( (lis->(lis.size()) >= sizeToComapre ))
-                .filter( (lis->(slectedFiteri.test(lis.size())) ))
+                .filter( (lis->(selectedFiteri.test(lis.size())) ))
                 .flatMap(x -> x.stream()).collect(Collectors.toList())) ;
     };
 }

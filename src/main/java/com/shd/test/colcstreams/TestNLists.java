@@ -8,8 +8,7 @@ import java.util.UUID;
 import java.util.function.Function;
 public class TestNLists extends NListsMatching<Student> {
     public Function<Student, String> xElmMakeKeyFunci =  (std) -> {
-        String retStr = UUID.nameUUIDFromBytes((std.getName() + std.getScore()).getBytes()).toString().replaceAll("-", "");
-        return retStr ;
+        return ( UUID.nameUUIDFromBytes((std.getName() + std.getScore()).getBytes()).toString().replaceAll("-", "")) ;
     };
     @Override
     public Function<Student, String> getxElmMakeKeyFunci() {
@@ -29,8 +28,8 @@ public class TestNLists extends NListsMatching<Student> {
         System.out.println("Size of lisoflis =" +lisOfLis.size() ) ;
         TestNLists  nlistTesti = new TestNLists() ;
         nlistTesti.setxElmMakeKeyFunci(xElmMakeKeyFunci);
-       // List<Student> outLis =nlistTesti.matchNLsits(lisOfLis) ;
-        List<Student> outLis =nlistTesti.distinctNLsits(lisOfLis) ;
+        List<Student> outLis =nlistTesti.matchNLsits(lisOfLis) ;
+       // List<Student> outLis =nlistTesti.distinctNLsits(lisOfLis) ;
         outLis.stream().forEach(System.out::println);
         System.out.println("End NList .................");
     }
