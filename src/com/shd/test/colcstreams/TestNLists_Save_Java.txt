@@ -1,0 +1,46 @@
+package com.shd.test.colcstreams;
+import com.shd.colcstreams.intersecmatch.longlists.LongListsMatchingAndDistinct;
+import com.shd.colcstreams.intersecmatch.nlists.NListsMatching;
+import com.shd.data.Student;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+public class TestNLists extends NListsMatching<Student,Student> {
+
+    public Function<Student, String> xElmMakeKeyFunci =  (std) -> {
+        String retStr = UUID.nameUUIDFromBytes((std.getName() + std.getScore()).getBytes()).toString().replaceAll("-", "");
+        System.out.println("xElmMakeKeyFunci from  NListsMatching called .................");
+        return retStr ;
+    };
+//    @Override
+//    public void setxElmMakeKeyFunci(Function<Student, String> xElmMakeKeyFunci) {
+//        super.setxElmMakeKeyFunci(xElmMakeKeyFunci);
+//    }
+    @Override
+    public Function<Student, String> getxElmMakeKeyFunci() {
+        return xElmMakeKeyFunci;
+    }
+    public static void main(String... str) {
+        TestNLists nLists = new TestNLists() ;
+
+        nLists.testNList();
+    }
+    public void testNList()
+    {
+
+        System.out.println("Start NList :");
+        Student studentRef = new Student() ;
+       // List<List<Student>>  lisOfLis = Arrays.asList(studentRef.makeList1(),studentRef.makeList2() );
+        List<List<Student>> lisOfLis = new ArrayList<>() ;
+        lisOfLis.add(studentRef.makeList1()) ;
+        lisOfLis.add(studentRef.makeList2()) ;
+        System.out.println("Size of lisoflis =" +lisOfLis.size() ) ;
+        TestNLists  nlistTesti = new TestNLists() ;
+        nlistTesti.setxElmMakeKeyFunci(xElmMakeKeyFunci);
+        List<Student> outLis =nlistTesti.matching2ListsFunction.matchNLsits(lisOfLis) ;
+        outLis.stream().forEach(System.out::println);
+        System.out.println("End NList .................");
+    }
+}
