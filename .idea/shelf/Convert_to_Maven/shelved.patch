@@ -1,0 +1,310 @@
+Index: src/main/java/com/shd/test/colcstreams/TestNLists_Save_Java.txt
+===================================================================
+--- src/main/java/com/shd/test/colcstreams/TestNLists_Save_Java.txt	(revision 3cbef4fc9b01ac7fe83d72b18e349286408da3b9)
++++ src/main/java/com/shd/test/colcstreams/TestNLists_Save_Java.txt	(revision 3cbef4fc9b01ac7fe83d72b18e349286408da3b9)
+@@ -1,46 +0,0 @@
+-package com.shd.test.colcstreams;
+-import com.shd.colcstreams.intersecmatch.longlists.LongListsMatchingAndDistinct;
+-import com.shd.colcstreams.intersecmatch.nlists.NListsMatching;
+-import com.shd.data.Student;
+-
+-import java.util.*;
+-import java.util.function.Function;
+-import java.util.stream.Collectors;
+-import java.util.stream.Stream;
+-public class TestNLists extends NListsMatching<Student,Student> {
+-
+-    public Function<Student, String> xElmMakeKeyFunci =  (std) -> {
+-        String retStr = UUID.nameUUIDFromBytes((std.getName() + std.getScore()).getBytes()).toString().replaceAll("-", "");
+-        System.out.println("xElmMakeKeyFunci from  NListsMatching called .................");
+-        return retStr ;
+-    };
+-//    @Override
+-//    public void setxElmMakeKeyFunci(Function<Student, String> xElmMakeKeyFunci) {
+-//        super.setxElmMakeKeyFunci(xElmMakeKeyFunci);
+-//    }
+-    @Override
+-    public Function<Student, String> getxElmMakeKeyFunci() {
+-        return xElmMakeKeyFunci;
+-    }
+-    public static void main(String... str) {
+-        TestNLists nLists = new TestNLists() ;
+-
+-        nLists.testNList();
+-    }
+-    public void testNList()
+-    {
+-
+-        System.out.println("Start NList :");
+-        Student studentRef = new Student() ;
+-       // List<List<Student>>  lisOfLis = Arrays.asList(studentRef.makeList1(),studentRef.makeList2() );
+-        List<List<Student>> lisOfLis = new ArrayList<>() ;
+-        lisOfLis.add(studentRef.makeList1()) ;
+-        lisOfLis.add(studentRef.makeList2()) ;
+-        System.out.println("Size of lisoflis =" +lisOfLis.size() ) ;
+-        TestNLists  nlistTesti = new TestNLists() ;
+-        nlistTesti.setxElmMakeKeyFunci(xElmMakeKeyFunci);
+-        List<Student> outLis =nlistTesti.matching2ListsFunction.matchNLsits(lisOfLis) ;
+-        outLis.stream().forEach(System.out::println);
+-        System.out.println("End NList .................");
+-    }
+-}
+Index: src/main/java/com/shd/colcstreams/intersecmatch/nlists/NListsMatching_SaveJava.txt
+===================================================================
+--- src/main/java/com/shd/colcstreams/intersecmatch/nlists/NListsMatching_SaveJava.txt	(revision 3cbef4fc9b01ac7fe83d72b18e349286408da3b9)
++++ src/main/java/com/shd/colcstreams/intersecmatch/nlists/NListsMatching_SaveJava.txt	(revision 3cbef4fc9b01ac7fe83d72b18e349286408da3b9)
+@@ -1,97 +0,0 @@
+-package com.shd.colcstreams.intersecmatch.nlists;
+-import com.shd.data.Student;
+-
+-import java.util.*;
+-import java.util.function.BiConsumer;
+-import java.util.function.BiPredicate;
+-import java.util.function.Function;
+-import java.util.stream.Collectors;
+-import java.util.stream.Stream;
+-public class NListsMatching<NXElm,N1XElm> {
+-    public Function<NXElm, String> xElmMakeKeyFunci = (xElm) -> xElm.toString();
+-    protected Function<NXElm, String> getxElmMakeKeyFunci() {
+-        return xElmMakeKeyFunci;
+-    }
+-    protected void setxElmMakeKeyFunci(Function<NXElm, String> xElmMakeKeyFuncii) {
+-        System.out.println("setxElmMakeKeyFunci from NListsMatching done.......... ") ;
+-        xElmMakeKeyFunci = xElmMakeKeyFuncii ;
+-    }
+-    private final BiConsumer<NXElm, Map<String, List<NXElm>>>  accumMatchi = (nxelm, mapLis) -> {
+-
+-            String keyStr = getxElmMakeKeyFunci().apply(nxelm);
+-            List<NXElm> lisOFXelm = mapLis.get(keyStr);
+-            if (lisOFXelm == null) {
+-                System.out.println("lisOFXelm= null") ;
+-                lisOFXelm = new ArrayList<NXElm>();
+-                mapLis.put(keyStr, lisOFXelm);
+-            }
+-            else {
+-                System.out.println("lisOFXelm!= NOT NOT null") ;
+-            }
+-            lisOFXelm.add(nxelm);
+-        } ;
+-
+-
+-
+-
+-    private final BiConsumer<List<NXElm>, Map<String, List<NXElm>>>  OldaccumMatchi = (lis, mapLis) -> {
+-        lis.stream().peek(nxelm -> {
+-            String keyStr = getxElmMakeKeyFunci().apply(nxelm);
+-            List<NXElm> lisOFXelm = mapLis.get(keyStr);
+-            if (lisOFXelm == null) {
+-                System.out.println("lisOFXelm= null") ;
+-                lisOFXelm = new ArrayList<NXElm>();
+-                mapLis.put(keyStr, lisOFXelm);
+-            }
+-            lisOFXelm.add(nxelm);
+-        })
+-        ;
+-    };
+-    // For Short list this simple match is Ok. For Long Lists with a million of records,
+-    // LongListsMatchingAndDistinct generic implemented in this package is the right one
+-    @FunctionalInterface
+-    public interface MatchingNListsFunction<NXElm,N1XElm> {
+-        N1XElm matchNLsits(NXElm lisOfLis);
+-        //List<XElm> matchLists(List<XElm> a1, List<XElm> a2, BiPredicate a3);
+-    }
+-    //Matching2ListsFunction is a Generic Function for simple Matching
+-    //Function implementations for any Type/XElm is implemented here and var parameter instance passed as implemented function (BiPredicate)
+-    // for Example Student Type call this function with List1<Student> , List2<Student> ,  and BiPredicate instance function
+-    public MatchingNListsFunction<List<List<NXElm>>,List<NXElm>> matching2ListsFunction = (listOfLists) ->
+-    {
+-        List<NXElm> lisouti = new ArrayList<NXElm>();
+-        Map<String, List<NXElm>> map4StudLis = new HashMap();
+-        listOfLists.stream().flatMap(x -> x.stream()).forEach(nxlem-> {
+-                System.out.println("InsidePeek" + nxlem.toString() ) ;
+-                accumMatchi.accept(nxlem, map4StudLis);
+-                });
+-
+-        return (map4StudLis.entrySet().stream().map(inp -> inp.getValue())
+-               //  .peek(ll-> System.out.println(ll.size()))
+-                .filter( (lis->(lis.size()) > 1 ))
+-                .flatMap(x -> x.stream()).collect(Collectors.toList())) ;
+-
+-
+-    };
+-}
+-/*** this one working without the filter ????? */
+-// return (map4StudLis.entrySet().stream().map(inp -> inp.getValue())
+-//         //.filter(lis->lisouti.size()>1)
+-//         .flatMap(x -> x.stream()).collect(Collectors.toList())) ;
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+Index: src/main/java/com/shd/colcstreams/intersecmatch/nlists/NListsMatching.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.shd.colcstreams.intersecmatch.nlists;\r\nimport java.util.ArrayList;\r\nimport java.util.HashMap;\r\nimport java.util.List;\r\nimport java.util.Map;\r\nimport java.util.function.BiConsumer;\r\nimport java.util.function.Function;\r\nimport java.util.function.Predicate;\r\nimport java.util.stream.Collectors;\r\npublic class NListsMatching<NXElm> {\r\n    int sizeToComapre =  -1 ;\r\n    public Function<NXElm, String> xElmMakeKeyFunci = (xElm) -> xElm.toString();\r\n    protected Function<NXElm, String> getxElmMakeKeyFunci() {\r\n        return xElmMakeKeyFunci;\r\n    }\r\n    protected void setxElmMakeKeyFunci(Function<NXElm, String> xElmMakeKeyFuncii) {\r\n        xElmMakeKeyFunci = xElmMakeKeyFuncii ;\r\n    }\r\n    private final BiConsumer<NXElm, Map<String, List<NXElm>>>  accumMatchi = (nxelm, mapLis) -> {\r\n            String keyStr = getxElmMakeKeyFunci().apply(nxelm);\r\n            List<NXElm> lisOFXelm = mapLis.get(keyStr);\r\n            if (lisOFXelm == null) {\r\n                lisOFXelm = new ArrayList<NXElm>();\r\n                mapLis.put(keyStr, lisOFXelm);\r\n            }\r\n            lisOFXelm.add(nxelm);\r\n        } ;\r\n    public List<NXElm> matchNLsits(List<List<NXElm>> listOfLists) {\r\n        sizeToComapre = listOfLists.size();\r\n        slectedFiteri=matchFilteri ;\r\n        return (matchOrDistinctNListsFunic2.matchNLsits(listOfLists));\r\n    }\r\n    public List<NXElm> distinctNLsits(List<List<NXElm>> listOfLists) {\r\n        sizeToComapre = 1 ;\r\n        slectedFiteri=distinctFilteri ;\r\n        return (matchOrDistinctNListsFunic2.matchNLsits(listOfLists));\r\n    }\r\n    // For Short list this simple match is Ok. For Long Lists with a million of records,\r\n    // LongListsMatchingAndDistinct generic implemented in this package is the right one\r\n    @FunctionalInterface\r\n    public interface MatchingNListsFunction<NXElm> {\r\n        List<NXElm> matchNLsits(List<List<NXElm>> lisOfLis);\r\n    }\r\n    private final Predicate<Integer>  matchFilteri =iSize -> {\r\n        return (iSize >= sizeToComapre);\r\n    };\r\n    private final Predicate<Integer>  distinctFilteri =iSize -> {\r\n        return (iSize == sizeToComapre);\r\n    };\r\n    private  Predicate<Integer>  slectedFiteri ;\r\n    //Matching2ListsFunction is a Generic Function for simple Matching\r\n    //Function implementations for any Type/XElm is implemented here and var parameter instance passed as implemented function (BiPredicate)\r\n    // for Example Student Type call this function with List1<Student> , List2<Student> ,  and BiPredicate instance function\r\n    //public MatchingNListsFunction <NXElm>  matchingNListsFunction  = this::matchNLsits;\r\n    private  MatchingNListsFunction <NXElm> matchOrDistinctNListsFunic2 = (listOfLists) ->\r\n    {\r\n        Map<String, List<NXElm>> map4StudLis = new HashMap();\r\n        listOfLists.stream().flatMap(xxx -> xxx.stream()).forEach(nxelm-> accumMatchi.accept(nxelm,map4StudLis));\r\n\r\n        return (map4StudLis.entrySet().stream().map(inp -> inp.getValue())\r\n               //  .peek(ll-> System.out.println(ll.size()))\r\n                //.filter( (lis->(lis.size()) >= sizeToComapre ))\r\n                .filter( (lis->(slectedFiteri.test(lis.size())) ))\r\n                .flatMap(x -> x.stream()).collect(Collectors.toList())) ;\r\n    };\r\n}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/shd/colcstreams/intersecmatch/nlists/NListsMatching.java	(revision 3cbef4fc9b01ac7fe83d72b18e349286408da3b9)
++++ src/main/java/com/shd/colcstreams/intersecmatch/nlists/NListsMatching.java	(date 1584637745865)
+@@ -27,12 +27,12 @@
+         } ;
+     public List<NXElm> matchNLsits(List<List<NXElm>> listOfLists) {
+         sizeToComapre = listOfLists.size();
+-        slectedFiteri=matchFilteri ;
++        selectedFiteri =matchFilteri ;
+         return (matchOrDistinctNListsFunic2.matchNLsits(listOfLists));
+     }
+     public List<NXElm> distinctNLsits(List<List<NXElm>> listOfLists) {
+         sizeToComapre = 1 ;
+-        slectedFiteri=distinctFilteri ;
++        selectedFiteri =distinctFilteri ;
+         return (matchOrDistinctNListsFunic2.matchNLsits(listOfLists));
+     }
+     // For Short list this simple match is Ok. For Long Lists with a million of records,
+@@ -47,7 +47,7 @@
+     private final Predicate<Integer>  distinctFilteri =iSize -> {
+         return (iSize == sizeToComapre);
+     };
+-    private  Predicate<Integer>  slectedFiteri ;
++    private  Predicate<Integer> selectedFiteri;
+     //Matching2ListsFunction is a Generic Function for simple Matching
+     //Function implementations for any Type/XElm is implemented here and var parameter instance passed as implemented function (BiPredicate)
+     // for Example Student Type call this function with List1<Student> , List2<Student> ,  and BiPredicate instance function
+@@ -55,12 +55,12 @@
+     private  MatchingNListsFunction <NXElm> matchOrDistinctNListsFunic2 = (listOfLists) ->
+     {
+         Map<String, List<NXElm>> map4StudLis = new HashMap();
+-        listOfLists.stream().flatMap(xxx -> xxx.stream()).forEach(nxelm-> accumMatchi.accept(nxelm,map4StudLis));
++        listOfLists.stream().flatMap(xlis -> xlis.stream()).forEach(nxelm-> accumMatchi.accept(nxelm,map4StudLis));
+ 
+         return (map4StudLis.entrySet().stream().map(inp -> inp.getValue())
+                //  .peek(ll-> System.out.println(ll.size()))
+                 //.filter( (lis->(lis.size()) >= sizeToComapre ))
+-                .filter( (lis->(slectedFiteri.test(lis.size())) ))
++                .filter( (lis->(selectedFiteri.test(lis.size())) ))
+                 .flatMap(x -> x.stream()).collect(Collectors.toList())) ;
+     };
+ }
+Index: src/main/java/com/shd/data/Student.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.shd.data;\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\nimport java.util.Optional;\r\nimport java.util.UUID;\r\npublic class Student {\r\n    public  enum GradeLevel  {One, Two, Three ,Four ,Five, Six,Seven,Eight,Nine,Ten,Elevn}\r\n    private  Optional<Integer> lisId;\r\n    private  String name;\r\n    private  int age;\r\n    private  int score;\r\n    private String idntStr ;\r\n    private  enum Gender {Female, Male}\r\n    private Gender gender ;\r\n    private GradeLevel gradeLevel ;\r\n    private String schoolName ;\r\n    private int recordNu ;\r\n    public void setLisId(Optional<Integer> lisId) {\r\n        this.lisId = lisId;\r\n    }\r\n    public void setName(String name) {\r\n        this.name = name;\r\n    }\r\n    public void setAge(int age) {\r\n        this.age = age;\r\n    }\r\n    public void setScore(int score) {\r\n        this.score = score;\r\n    }\r\n    public void setGender(Gender gender) {this.gender = gender;}\r\n    public String getIdntStr() {return idntStr;}\r\n    public void setIdntStr(String idntStr) {this.idntStr = idntStr;}\r\n    public GradeLevel getGradeLevel() { return gradeLevel;}\r\n    public String getGradeLevelStr() {return gradeLevel.toString();}\r\n    public void setGradeLevel(GradeLevel gradeLevel) {this.gradeLevel = gradeLevel;}\r\n    public String getSchoolName() {return schoolName; }\r\n    public void setSchoolName(String schoolName) {this.schoolName = schoolName;}\r\n    public int getAge() {return age;}\r\n    public String getName() {return name; }\r\n    public int getScore() { return score;}\r\n    public Gender getGender() {return gender;}\r\n    public int getRecordNu() {return recordNu++;}\r\n    public void setRecordNu(int recordNu) {this.recordNu = recordNu;}\r\n    public Optional<Integer> getLisId() { return lisId; }\r\n\r\n    public Student() {\r\n\r\n    }\r\n\r\n    public Student(String namei,Gender genderi, int agei, GradeLevel gradeLeveli,int recordNui, String schoolNamei, int scorei, Integer lisIdi) {\r\n        //idnt = UUID.nameUUIDFromBytes((namei+\"L\" + String.valueOf(lisId)).getBytes()).toString().replaceAll(\"-\",\"\");\r\n        idntStr = UUID.nameUUIDFromBytes(namei.getBytes()).toString().replaceAll(\"-\", \"\");\r\n        name = namei;\r\n        gender=genderi ;\r\n        age = agei;\r\n        gradeLevel = gradeLeveli;\r\n        recordNu=recordNui;\r\n        schoolName=schoolNamei;\r\n        score = scorei;\r\n        lisId = Optional.ofNullable(lisIdi);\r\n    }\r\n    public String getIdnStr() {\r\n        return idntStr;\r\n    }\r\n    @Override\r\n    public String toString() {\r\n        return \"Student{\" +\r\n                \"name='\" + name + '\\'' +\r\n                \", age=\" + age +\r\n                \", score=\" + score +\r\n                \", grade='\" + gradeLevel + '\\'' +\r\n                \", idntStr='\" + idntStr + '\\'' +\r\n                \", gender=\" + gender + '\\'' +\r\n                \", schoolName='\" + schoolName + '\\'' +\r\n                \", recordNu='\" + recordNu +\r\n                \",lisId=\" + lisId +'\\'' +\r\n                '}';\r\n    }\r\n    public   List<Student>  makeList1() {\r\n        //Optional<Integer> lisIdInp1 = Optional.of(1);\r\n        int lisIdInp1 = 1;\r\n        List<Student>  studentLis1 = Arrays.asList(\r\n                new Student(\"GrandMary\", Gender.Female, 6, GradeLevel.Six,1,\"Erindale\", 90, lisIdInp1),\r\n                new Student(\"Daniel\", Gender.Male, 7, GradeLevel.Seven, 2,\"Brookmede\", 91, lisIdInp1),\r\n                new Student(\"David\", Gender.Male, 8, GradeLevel.Eight,3, \"Whitehead\", 95, null),\r\n                new Student(\"Madison\", Gender.Female, 9, GradeLevel.Nine,4, \"HolyNameOfMary\", 95, lisIdInp1),\r\n                new Student(\"Alexandra\", Gender.Female, 10, GradeLevel.Ten,5, \"YoungMinds\", 93, lisIdInp1),\r\n                new Student(\"Katherine\", Gender.Female, 11, GradeLevel.Elevn, 6,\"StChristopher\", 97, lisIdInp1),\r\n                new Student(\"Caroline\", Gender.Female, 14, GradeLevel.Three,7, \"Tecumseh\", 90, lisIdInp1),\r\n                new Student(\"Matthew\", Gender.Male, 14, GradeLevel.Two,8,\"RiverSide\", 93, lisIdInp1),\r\n                new Student(\"Leon\", Gender.Male, 14, GradeLevel.Ten,9, \"RiverSide\", 97, lisIdInp1),\r\n                new Student(\"Natalie\", Gender.Female, 11, GradeLevel.Five, 10,\"Clarkson\", 90, lisIdInp1),\r\n                new Student(\"Sophie\", Gender.Female, 15, GradeLevel.One,11, \"GreenGlad\", 91, lisIdInp1),\r\n                new Student(\"George\", Gender.Male, 14, GradeLevel.Four, 12,\"LynnEagle\", 98, lisIdInp1)\r\n        );\r\n  return studentLis1 ;\r\n    }\r\n    public   List<Student>  makeList2() {\r\n        //Optional<Integer> lisIdInp2 = Optional.of(2);\r\n        int lisIdInp2 =2 ;\r\n        return Arrays.asList(\r\n                new Student(\"GrandMary\", Gender.Female, 6, GradeLevel.Six,1,\"Erindale\", 92, lisIdInp2),\r\n                new Student(\"Daniel\", Gender.Male, 7, GradeLevel.Seven, 2,\"Brookmede\", 92, lisIdInp2),\r\n                new Student(\"David\", Gender.Male, 8, GradeLevel.Eight,3, \"Whitehead\", 95, null),\r\n                new Student(\"Madison\", Gender.Female, 9, GradeLevel.Nine,4, \"HolyNameOfMary\", 95, lisIdInp2),\r\n                new Student(\"Alexandra\", Gender.Female, 10, GradeLevel.Ten,5, \"YoungMinds\", 93, lisIdInp2),\r\n                new Student(\"Katherine\", Gender.Female, 11, GradeLevel.Elevn, 6,\"StChristopher\", 97, lisIdInp2),\r\n                new Student(\"Caroline\", Gender.Female, 14, GradeLevel.Three,7, \"Tecumseh\", 90, lisIdInp2),\r\n                new Student(\"Matthew\", Gender.Male, 14, GradeLevel.Two,8,\"RiverSide\", 93, lisIdInp2),\r\n                new Student(\"Leon\", Gender.Male, 14, GradeLevel.Ten,9, \"RiverSide\", 97, lisIdInp2),\r\n                new Student(\"Natalie\", Gender.Female, 11, GradeLevel.Five, 10,\"Clarkson\", 90, lisIdInp2),\r\n                new Student(\"Sophie\", Gender.Female, 15, GradeLevel.One,11, \"GreenGlad\", 91, lisIdInp2),\r\n                new Student(\"George\", Gender.Male, 14, GradeLevel.Four, 12,\"LynnEagle\", 98, lisIdInp2)\r\n        );\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/shd/data/Student.java	(revision 3cbef4fc9b01ac7fe83d72b18e349286408da3b9)
++++ src/main/java/com/shd/data/Student.java	(date 1584638016047)
+@@ -42,13 +42,12 @@
+     public int getRecordNu() {return recordNu++;}
+     public void setRecordNu(int recordNu) {this.recordNu = recordNu;}
+     public Optional<Integer> getLisId() { return lisId; }
+-
++//
+     public Student() {
+ 
+     }
+-
++//
+     public Student(String namei,Gender genderi, int agei, GradeLevel gradeLeveli,int recordNui, String schoolNamei, int scorei, Integer lisIdi) {
+-        //idnt = UUID.nameUUIDFromBytes((namei+"L" + String.valueOf(lisId)).getBytes()).toString().replaceAll("-","");
+         idntStr = UUID.nameUUIDFromBytes(namei.getBytes()).toString().replaceAll("-", "");
+         name = namei;
+         gender=genderi ;
+@@ -79,7 +78,7 @@
+     public   List<Student>  makeList1() {
+         //Optional<Integer> lisIdInp1 = Optional.of(1);
+         int lisIdInp1 = 1;
+-        List<Student>  studentLis1 = Arrays.asList(
++        return Arrays.asList(
+                 new Student("GrandMary", Gender.Female, 6, GradeLevel.Six,1,"Erindale", 90, lisIdInp1),
+                 new Student("Daniel", Gender.Male, 7, GradeLevel.Seven, 2,"Brookmede", 91, lisIdInp1),
+                 new Student("David", Gender.Male, 8, GradeLevel.Eight,3, "Whitehead", 95, null),
+@@ -93,10 +92,8 @@
+                 new Student("Sophie", Gender.Female, 15, GradeLevel.One,11, "GreenGlad", 91, lisIdInp1),
+                 new Student("George", Gender.Male, 14, GradeLevel.Four, 12,"LynnEagle", 98, lisIdInp1)
+         );
+-  return studentLis1 ;
+     }
+     public   List<Student>  makeList2() {
+-        //Optional<Integer> lisIdInp2 = Optional.of(2);
+         int lisIdInp2 =2 ;
+         return Arrays.asList(
+                 new Student("GrandMary", Gender.Female, 6, GradeLevel.Six,1,"Erindale", 92, lisIdInp2),
+@@ -113,5 +110,4 @@
+                 new Student("George", Gender.Male, 14, GradeLevel.Four, 12,"LynnEagle", 98, lisIdInp2)
+         );
+     }
+-
+ }
+\ No newline at end of file
+Index: src/main/java/com/shd/test/colcstreams/TestByCollectJDKIFBuiltIn.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.shd.test.colcstreams;\r\nimport java.util.*;\r\nimport java.util.stream.Collector;\r\nimport java.util.stream.IntStream;\r\npublic class TestByCollectJDKIFBuiltIn {\r\n/* JDK Collector Interface\r\n * public interface Collector<T, A, R> { // T: Type of the data stream,\r\n *                                      // A: Accumulation type, to store the intermediate results.\r\n * \t\t\t\t\t\t\t\t\t\t//R: Return type, this is return type.\r\n * Supplier<A> supplier();\r\n * * BiConsumer<A, T> accumulator();\r\n * * BinaryOperator<A> combiner();\r\n * * Function<A, R> finisher();\r\n * * Set<Characteristics> characteristics(); }\r\n * The interface Collector provides the static method Collector.of(...) to create a Collector in a more functional way.\r\n * helping us to reduce the need for an extra class. here is example for using this interfcae\r\n */\r\n    public static void main(String[] args) {\r\n\r\n        final List<Integer> result1 = IntStream.of(1, 2, 3, 4, 3, 4, 5)\r\n                .boxed()\r\n                .collect(uniqueCollector()); //distinct\r\n        System.out.println(\"result1:\" + result1);\r\n        CharSequence charSeq1 = \" \" ;\r\n        String result2 = IntStream.of(1, 2, 3, 4, 3, 4, 5)\r\n                .boxed()\r\n                .map(i -> String.valueOf(i))\r\n                .collect(joineCollector(charSeq1));\r\n        System.out.println(\"result2:\" + result2);\r\n    }\r\n\r\n    public static <T> Collector<T, Set<T>, List<T>> uniqueCollector() { //This is a genric Distinct\r\n        return Collector.of( () -> {\r\n                   return  new HashSet<T>() ;        // supplier\r\n                }  ,\r\n                Set::add,                            // accumulator\r\n                (result1, result2) -> {              // combiner/merge for parallel/CONCURRENT\r\n                    result1.addAll(result2);\r\n                    return result1;\r\n                },\r\n                ArrayList::new,                        //// finisher result Accumulated\r\n                Collector.Characteristics.CONCURRENT,\r\n                Collector.Characteristics.UNORDERED);\r\n        }\r\n    //Simple more:\r\n    public static Collector<CharSequence, StringJoiner, String> joineCollector(CharSequence delimiter) {\r\n        return Collector.of(() -> new StringJoiner(delimiter), // supplier\r\n                StringJoiner::add,                 // accumulator\r\n                StringJoiner::merge,               // combiner\r\n                StringJoiner::toString);           // finisher\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/shd/test/colcstreams/TestByCollectJDKIFBuiltIn.java	(revision 3cbef4fc9b01ac7fe83d72b18e349286408da3b9)
++++ src/main/java/com/shd/test/colcstreams/TestByCollectJDKIFBuiltIn.java	(date 1584638211405)
+@@ -13,7 +13,7 @@
+  * * Function<A, R> finisher();
+  * * Set<Characteristics> characteristics(); }
+  * The interface Collector provides the static method Collector.of(...) to create a Collector in a more functional way.
+- * helping us to reduce the need for an extra class. here is example for using this interfcae
++ * helping us to reduce the need for an extra class. here is example for using this interfcae.
+  */
+     public static void main(String[] args) {
+ 
+@@ -29,7 +29,7 @@
+         System.out.println("result2:" + result2);
+     }
+ 
+-    public static <T> Collector<T, Set<T>, List<T>> uniqueCollector() { //This is a genric Distinct
++    public static <T> Collector<T, Set<T>, List<T>> uniqueCollector() { //This is a generic Distinct
+         return Collector.of( () -> {
+                    return  new HashSet<T>() ;        // supplier
+                 }  ,
+Index: src/main/java/com/shd/test/colcstreams/TestNLists.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.shd.test.colcstreams;\r\nimport com.shd.colcstreams.intersecmatch.nlists.NListsMatching;\r\nimport com.shd.data.Student;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\nimport java.util.UUID;\r\nimport java.util.function.Function;\r\npublic class TestNLists extends NListsMatching<Student> {\r\n    public Function<Student, String> xElmMakeKeyFunci =  (std) -> {\r\n        String retStr = UUID.nameUUIDFromBytes((std.getName() + std.getScore()).getBytes()).toString().replaceAll(\"-\", \"\");\r\n        return retStr ;\r\n    };\r\n    @Override\r\n    public Function<Student, String> getxElmMakeKeyFunci() {\r\n        return xElmMakeKeyFunci;\r\n    }\r\n    public static void main(String... str) {\r\n        TestNLists nLists = new TestNLists() ;\r\n        nLists.testNList();\r\n    }\r\n    public void testNList()\r\n    {\r\n        Student studentRef = new Student() ;\r\n       // List<List<Student>>  lisOfLis = Arrays.asList(studentRef.makeList1(),studentRef.makeList2() );\r\n        List<List<Student>> lisOfLis = new ArrayList<>() ;\r\n        lisOfLis.add(studentRef.makeList1()) ;\r\n        lisOfLis.add(studentRef.makeList2()) ;\r\n        System.out.println(\"Size of lisoflis =\" +lisOfLis.size() ) ;\r\n        TestNLists  nlistTesti = new TestNLists() ;\r\n        nlistTesti.setxElmMakeKeyFunci(xElmMakeKeyFunci);\r\n       // List<Student> outLis =nlistTesti.matchNLsits(lisOfLis) ;\r\n        List<Student> outLis =nlistTesti.distinctNLsits(lisOfLis) ;\r\n        outLis.stream().forEach(System.out::println);\r\n        System.out.println(\"End NList .................\");\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/shd/test/colcstreams/TestNLists.java	(revision 3cbef4fc9b01ac7fe83d72b18e349286408da3b9)
++++ src/main/java/com/shd/test/colcstreams/TestNLists.java	(date 1584638333628)
+@@ -8,8 +8,7 @@
+ import java.util.function.Function;
+ public class TestNLists extends NListsMatching<Student> {
+     public Function<Student, String> xElmMakeKeyFunci =  (std) -> {
+-        String retStr = UUID.nameUUIDFromBytes((std.getName() + std.getScore()).getBytes()).toString().replaceAll("-", "");
+-        return retStr ;
++        return ( UUID.nameUUIDFromBytes((std.getName() + std.getScore()).getBytes()).toString().replaceAll("-", "")) ;
+     };
+     @Override
+     public Function<Student, String> getxElmMakeKeyFunci() {
+@@ -29,8 +28,8 @@
+         System.out.println("Size of lisoflis =" +lisOfLis.size() ) ;
+         TestNLists  nlistTesti = new TestNLists() ;
+         nlistTesti.setxElmMakeKeyFunci(xElmMakeKeyFunci);
+-       // List<Student> outLis =nlistTesti.matchNLsits(lisOfLis) ;
+-        List<Student> outLis =nlistTesti.distinctNLsits(lisOfLis) ;
++        List<Student> outLis =nlistTesti.matchNLsits(lisOfLis) ;
++       // List<Student> outLis =nlistTesti.distinctNLsits(lisOfLis) ;
+         outLis.stream().forEach(System.out::println);
+         System.out.println("End NList .................");
+     }
