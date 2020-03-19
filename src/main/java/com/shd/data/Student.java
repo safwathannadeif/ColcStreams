@@ -4,8 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 public class Student {
-    public  enum GradeLevel  {One, Two, Three ,Four ,Five, Six,Seven,Eight,Nine,Ten,Elevn} ;
-
+    public  enum GradeLevel  {One, Two, Three ,Four ,Five, Six,Seven,Eight,Nine,Ten,Elevn}
     private  Optional<Integer> lisId;
     private  String name;
     private  int age;
@@ -99,7 +98,7 @@ public class Student {
     public   List<Student>  makeList2() {
         //Optional<Integer> lisIdInp2 = Optional.of(2);
         int lisIdInp2 =2 ;
-        List<Student>   studentLis2 = Arrays.asList(
+        return Arrays.asList(
                 new Student("GrandMary", Gender.Female, 6, GradeLevel.Six,1,"Erindale", 92, lisIdInp2),
                 new Student("Daniel", Gender.Male, 7, GradeLevel.Seven, 2,"Brookmede", 92, lisIdInp2),
                 new Student("David", Gender.Male, 8, GradeLevel.Eight,3, "Whitehead", 95, null),
@@ -113,7 +112,6 @@ public class Student {
                 new Student("Sophie", Gender.Female, 15, GradeLevel.One,11, "GreenGlad", 91, lisIdInp2),
                 new Student("George", Gender.Male, 14, GradeLevel.Four, 12,"LynnEagle", 98, lisIdInp2)
         );
- return studentLis2 ;
     }
 
 }

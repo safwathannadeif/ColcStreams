@@ -41,8 +41,7 @@ public class TestByCollectJDKIFBuiltIn {
                 ArrayList::new,                        //// finisher result Accumulated
                 Collector.Characteristics.CONCURRENT,
                 Collector.Characteristics.UNORDERED);
-        } ;
-
+        }
     //Simple more:
     public static Collector<CharSequence, StringJoiner, String> joineCollector(CharSequence delimiter) {
         return Collector.of(() -> new StringJoiner(delimiter), // supplier

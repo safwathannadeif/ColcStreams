@@ -35,7 +35,7 @@ public class LongListsMatchingAndDistinct<XElm> {
         return map;
     };
     private final BiFunction<List<XElm>,Set<String>,List<XElm>> doMatchLists = (lis1, ls2Set) ->  {
-        return (lis1.stream().filter(xelm -> ls2Set.contains(getxElmMakeKeyFunci().apply(xelm))).map(x -> (XElm) x).collect(Collectors.toList()));  //.collect(Collectors.toList()));
+        return (lis1.stream().filter(xelm -> ls2Set.contains(getxElmMakeKeyFunci().apply(xelm))).map(x -> x).collect(Collectors.toList()));  //.collect(Collectors.toList()));
     };
 
     private final BiFunction<List<XElm>,Set<String> ,List<XElm>> doDistinctList  = (lisx,setKeyElm) -> {

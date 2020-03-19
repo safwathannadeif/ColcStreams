@@ -42,10 +42,10 @@ public class NListsMatching<NXElm> {
         List<NXElm> matchNLsits(List<List<NXElm>> lisOfLis);
     }
     private final Predicate<Integer>  matchFilteri =iSize -> {
-        return ((iSize >= sizeToComapre) ? true : false);
+        return (iSize >= sizeToComapre);
     };
     private final Predicate<Integer>  distinctFilteri =iSize -> {
-        return ((iSize == sizeToComapre) ? true : false);
+        return (iSize == sizeToComapre);
     };
     private  Predicate<Integer>  slectedFiteri ;
     //Matching2ListsFunction is a Generic Function for simple Matching
